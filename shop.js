@@ -37,11 +37,15 @@ function renderBasket() {
     if (cartButtonsRow) cartButtonsRow.style.display = "none";
     return;
   }
+  const counts = {};
   basket.forEach((product) => {
+    counts[product] = (counts[product] || 0) + 1;
+  });
+  Object.entries(counts).forEach(([product, quantity]) => {
     const item = PRODUCTS[product];
     if (item) {
       const li = document.createElement("li");
-      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name}</span>`;
+      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${quantity}x ${item.name}</span>`;
       basketList.appendChild(li);
     }
   });
