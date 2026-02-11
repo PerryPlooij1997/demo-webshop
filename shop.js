@@ -37,27 +37,37 @@ function renderBasket() {
     if (cartButtonsRow) cartButtonsRow.style.display = "none";
     return;
   }
-  basket.forEach((product) => {
-    const item = PRODUCTS[product];
+  const grouped = basket.reduce((acc, productKey) => {
+    const currentCount = acc[productKey] || 0;
+    return Object.assign(acc, { [productKey]: currentCount + 1 });
+  }, {});
+
+  Object.entries(grouped).forEach(([productKey, quantity]) => {
+    const item = PRODUCTS[productKey];
     if (item) {
       const li = document.createElement("li");
-      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name}</span>`;
+      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${quantity}x ${item.name}</span>`;
       basketList.appendChild(li);
     }
   });
   if (cartButtonsRow) cartButtonsRow.style.display = "flex";
 }
 
+function getBasketIndicator() {
+  const existing = document.querySelector(".basket-indicator");
+  if (existing) return existing;
+  const basketLink = document.querySelector(".basket-link");
+  if (!basketLink) return null;
+  const indicator = document.createElement("span");
+  indicator.className = "basket-indicator";
+  basketLink.appendChild(indicator);
+  return indicator;
+}
+
 function renderBasketIndicator() {
   const basket = getBasket();
-  let indicator = document.querySelector(".basket-indicator");
-  if (!indicator) {
-    const basketLink = document.querySelector(".basket-link");
-    if (!basketLink) return;
-    indicator = document.createElement("span");
-    indicator.className = "basket-indicator";
-    basketLink.appendChild(indicator);
-  }
+  const indicator = getBasketIndicator();
+  if (!indicator) return;
   if (basket.length > 0) {
     indicator.textContent = basket.length;
     indicator.style.display = "flex";
