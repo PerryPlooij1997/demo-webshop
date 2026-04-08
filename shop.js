@@ -26,6 +26,16 @@ function clearBasket() {
   localStorage.removeItem("basket");
 }
 
+function getBasketSummary() {
+  const basket = getBasket();
+  const summary = basket.reduce((acc, product) => {
+    if (!PRODUCTS[product]) return acc;
+    acc[product] = (acc[product] || 0) + 1;
+    return acc;
+  }, {});
+  return Object.entries(summary).map(([product, quantity]) => ({ product, quantity }));
+}
+
 function renderBasket() {
   const basket = getBasket();
   const basketList = document.getElementById("basketList");
@@ -37,14 +47,17 @@ function renderBasket() {
     if (cartButtonsRow) cartButtonsRow.style.display = "none";
     return;
   }
-  basket.forEach((product) => {
+
+  const basketItems = getBasketSummary();
+  basketItems.forEach(({ product, quantity }) => {
     const item = PRODUCTS[product];
     if (item) {
       const li = document.createElement("li");
-      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${item.name}</span>`;
+      li.innerHTML = `<span class='basket-emoji'>${item.emoji}</span> <span>${quantity}x ${item.name}</span>`;
       basketList.appendChild(li);
     }
   });
+
   if (cartButtonsRow) cartButtonsRow.style.display = "flex";
 }
 
